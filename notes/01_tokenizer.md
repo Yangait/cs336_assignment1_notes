@@ -170,7 +170,7 @@ len("hello! こんにちは!".encode("utf-8"))
 1. UTF-8 是互联网文本中最常用的编码。
 2. ASCII 英文字符在 UTF-8 中只占 1 byte。
 3. UTF-32 对所有字符通常使用 4 bytes，空间浪费更大。
-4. byte-level BPE 只需要 256 个基础 byte token，不会出现 OOV。
+4. byte-level BPE 只需要 256 个基础 byte token，不会出现 OOV (UTF-16, UTF-32 也不会出现 OOV 因为都是 byte-level BPE. Word-level and Character-level tokenizer 会 OOV)。
 
 OOV 指：
 
@@ -337,6 +337,8 @@ special_tokens = ["<|endoftext|>"]
 ## 7. Step 2: Pre-tokenization
 
 ### 7.1 为什么需要 pre-tokenization？
+
+pre-tokenization 是先把原文本按照某种规则分成多个细小部分(word-level), 然后对每个部分进行merge
 
 理论上，可以直接对整个文本的 bytes 统计相邻 pair。
 
@@ -797,7 +799,7 @@ the cat ate
 
 ### 12.1 为什么 decode 要用 errors="replace"？
 
-并不是所有 token ID 序列都一定能组成合法 UTF-8。
+并不是所有 token ID 序列都一定能组成合法 UTF-8。(UTF-8 的前缀会决定是多字节还是单字节)
 
 如果出现非法 byte 序列，直接 decode 会报错。
 
